@@ -1,14 +1,19 @@
 <template>
   <div class="hello">
    {{priceArray}}
+   <h2>Cheapest: {{priceArray[0]}}</h2>
+   <h3>{{cheapest}}</h3>
   </div>
 </template>
 
 <script>
 export default {
   name: 'Travel',
-  props: {
-    msg: String
+  data(){
+    return{
+      priceArray: [],
+      cheapest: '',
+    }
   },
   computed: {
     storeData(){
@@ -16,16 +21,37 @@ export default {
     }
   },
   mounted(){
-    console.log(2)
-      //  let travelPrices = [];
-       Object.keys(this.storeData).forEach(function (item) {
-        console.log(item); // key
-        console.log(this.storeData[item]); // value
-        Object.keys(this.storeData[item]).forEach(function (item2){
-          console.log(item2.price)
-        })
-       })
-}
+    // setTimeout(()=>{
+    //   console.log(this.storeData.train.price)
+    //   for (let x in this.storeData){
+    //     this.priceArray.push(Number(this.storeData[x].price.split(' ')[0]))
+    //   }
+    //   this.priceArray.sort()
+    //
+    //   for (let x in this.storeData){
+    //     console.log(this.storeData[x])
+    //     if (Number(this.storeData[x].price.split(' ')[0]==this.priceArray[0])){
+    //       this.cheapest = x;
+    //     }
+    //   }
+    // }, 2000)
+
+  },
+  watch:{
+    storeData(){
+      for (let x in this.storeData){
+        this.priceArray.push(Number(this.storeData[x].price.split(' ')[0]))
+      }
+      this.priceArray.sort()
+
+      for (let x in this.storeData){
+        console.log(this.storeData[x])
+        if (Number(this.storeData[x].price.split(' ')[0]==this.priceArray[0])){
+          this.cheapest = x;
+        }
+      }
+    },
+  }
 }
 </script>
 
