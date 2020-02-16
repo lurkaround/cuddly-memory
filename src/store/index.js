@@ -8,11 +8,15 @@ import axios from 'axios';
 export default new Vuex.Store({
   state: {
     apiresult: null,
+    apiAll: null,
   },
   mutations: {
     setApi(state,payload){
       state.apiresult = payload;
-    }
+    },
+    setApiAll(state,payload){
+      state.apiAll = payload;
+    },
   },
   actions: {
     loadAPI({commit}){
@@ -22,8 +26,11 @@ export default new Vuex.Store({
         )
         .then(res => {
           let payload = res.data.transportStatus;
+          let payload2 = res.data;
           console.log(payload);
           commit("setApi", payload);
+          commit("setApiAll", payload2);
+
         });
     }
   },
