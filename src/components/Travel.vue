@@ -1,19 +1,17 @@
 <template>
   <div class="hello">
-    <h1>From {{fromPlace}} to {{toPlace}}</h1>
-  <h2>Cheapest: ${{priceArray[0]}} -- {{cheapest}} -- {{duration}}</h2>
-   <h1>Date & time of dep.:{{dateOfDeparture}} {{timeOfDeparture}}</h1>
-   <h1>Date & time of arr.:{{dateOfArrival}} {{timeOfArrival}}</h1>
+    <h1>Find your way from {{cheapestDeparture}} to {{cheapestArrival}}!</h1>
+    <h3>Cheapest option: {{cheapest}}</h3>
 
    <h3>All cheapest options:</h3>
-   <ul>
-     <li v-for="(item,i) in methodPriceArray">{{item}}</li>
-   </ul>
 
-   <h4>Durations and places</h4>
-   <ul>
-     <li v-for="(item2,i) in superArray">{{item2}}</li>
-   </ul>
+     <div class="methods" v-for="(item,i) in methodPriceArray" :key="i">
+        <span class="bold">Method of transportation: </span>{{item.split(',')[0]}}
+        <span class="bold">Price: </span>{{item.split(',')[1]}}
+        <span class="bold">Departure:</span>{{item.split(',')[2]}}
+        <span class="bold">Arrival: </span>{{item.split(',')[3]}}
+        <span class="bold">Duration: </span>{{item.split(',')[4]}}
+     </div>
 
 
   </div>
@@ -27,64 +25,79 @@ export default {
       priceArray: [],
       methodPriceArray: [],
       cheapest: '',
-      dateOfDeparture: '',
-      timeOfDeparture: '',
-      dateOfArrival: '',
-      timeOfArrival: '',
-      fromPlace: '',
-      toPlace: '',
-      duration: '',
-      superArray: [],
-      helper: [],
     }
   },
   computed: {
-    storeData(){
+    cheapestData(){
+      //this contains the cheapest travel modes
       return this.$store.state.apiresult;
     },
     allData(){
+      //this contains all the big messy stuff
       return this.$store.state.apiAll;
+    },
+    cheapestDeparture(){
+      for (let x of this.methodPriceArray){
+        console.log(this.methodPriceArray)
+        if (x.split(',')[0]==this.cheapest.split(',')[0]) {
+          return x.split(',')[2]
+        }
+      }
+      return ''
+    },
+    cheapestArrival(){
+      for (let x of this.methodPriceArray){
+        console.log(this.methodPriceArray)
+        if (x.split(',')[0]==this.cheapest.split(',')[0]) {
+          return x.split(',')[3]
+        }
+      }
+      return ''
     }
   },
   mounted(){
 
   },
   watch:{
-    storeData(){
-      for (let y in this.storeData){
-        // this.methodPriceArray.push(y + '---' + this.storeData[y].price)
-        this.methodPriceArray.push(`${y}---${this.storeData[y].price}`)
+    cheapestData(){
+      for (let y in this.cheapestData){
+        this.methodPriceArray.push(`${y},${this.cheapestData[y].price}`)
+        //['train,13 $', 'bus, 35 $']
       }
+      console.log(this.methodPriceArray)
 
 
-      for (let x in this.storeData){
-        this.priceArray.push(Number(this.storeData[x].price.split(' ')[0]))
+      for (let x in this.cheapestData){
+        this.priceArray.push(Number(this.cheapestData[x].price.split(' ')[0]))
       }
-      this.priceArray.sort()
+      this.priceArray.sort() // get the cheapest method sorted by price
+      console.log(this.priceArray)
 
-      for (let x in this.storeData){
-
-        if (Number(this.storeData[x].price.split(' ')[0]==this.priceArray[0])){
-          this.cheapest = x;
+      //get the travel mode + price in a comma separated string
+      for (let x in this.cheapestData){
+        if (Number(this.cheapestData[x].price.split(' ')[0]==this.priceArray[0])){
+          this.cheapest = x + ',' +this.cheapestData[x].price;
+          //"car,1.11 $"
         }
       }
     },
     allData(){
       console.log(this.allData)
-      this.dateOfDeparture = this.allData.result[0].segments[0].fromTimeISO8601.toString().split('+')[0].split('T')[0]
-      this.timeOfDeparture = this.allData.result[0].segments[0].fromTimeISO8601.toString().split('+')[0].split('T')[1]
-      this.dateOfArrival = this.allData.result[0].segments[0].toTimeISO8601.toString().split('+')[0].split('T')[0]
-      this.timeOfArrival = this.allData.result[0].segments[0].toTimeISO8601.toString().split('+')[0].split('T')[1]
+      //loop through all cheapest methods
+      for (var i = 0; i < this.methodPriceArray.length; i++) {
+        let travelmethod = this.methodPriceArray[i].split(',')[0]
+        let price = this.methodPriceArray[i].split(',')[1]
 
-      this.fromPlace = this.allData.result[0].segments[0].departure
-      this.toPlace = this.allData.result[0].segments[0].arrival
-
-      for(let k of this.allData.result){
-        if (!this.helper.includes(k.transport)&&k.price!=null) {
-          this.helper.push(k.transport)
-          this.superArray.push(`${k.transport} -- ${k.duration} -- dep: ${k.segments[0].departure} -- arr: ${k.segments[0].arrival}`)
+        //find duration, dep, arr in the result array
+        for (let k=0; k< this.allData.result.length;k++){
+          if (this.allData.result[k].transport===travelmethod&&this.allData.result[k].price===price) {
+            this.methodPriceArray[i] += `,${this.allData.result[k].segments[0].departure}, ${this.allData.result[k].segments[0].arrival}, ${this.allData.result[k].duration}`;
+            break;
+          }
         }
       }
+      console.log(this.methodPriceArray)
+      //bus,26.69 $,Sesto San Giovanni, Rome Tiburtina, 9h 45min
     },
   }
 }
@@ -97,5 +110,16 @@ export default {
   }
   h1{
     font-size: 25px;
+  }
+  .bold{
+    font-weight: bold;
+  }
+  .methods{
+    border: 1px solid grey;
+    margin-bottom: 20px;
+
+    span{
+      display: block;
+    }
   }
 </style>
