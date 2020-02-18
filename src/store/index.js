@@ -22,13 +22,13 @@ export default new Vuex.Store({
     loadAPI({commit}){
       axios
         .get(
-          "http://www.virail.com/virail/v7/search/en_us?from=c.3173435&to=c.3169070&lang=en_us&dt=2020-02-16&currency=USD&adult_passengers=1"
+          "http://www.virail.com/virail/v7/search/en_us?from=c.3173435&to=c.3169070&lang=en_us&dt=2020-02-23&currency=USD&adult_passengers=1"
         )
         .then(res => {
-          let payload = res.data.transportStatus;
+          let cheapest = res.data.transportStatus;
           let payload2 = res.data;
-          console.log(payload);
-          commit("setApi", payload);
+          console.log(payload2)
+          commit("setApi", cheapest);
           commit("setApiAll", payload2);
 
         });
