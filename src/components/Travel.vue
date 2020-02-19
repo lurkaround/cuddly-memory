@@ -1,5 +1,5 @@
 <template>
-  <div class="hello">
+  <!-- <div class="hello">
     <h1>Find your way from {{cheapestDeparture}} to {{cheapestArrival}}!</h1>
     <h3>Cheapest option: {{cheapest}}</h3>
 
@@ -14,7 +14,84 @@
      </div>
 
 
+  </div> -->
+
+  <div class="container" id="app">
+
+  <h3 class="text-center">Cheapest Option</h3>
+  <div class="columns medium-4" >
+    <div class="card">
+      <div class="card-section">
+        <p> Transport Type </p>
+      </div>
+      <div class="card-divider">
+        {{cheapest.split(',')[0]}}
+      </div>
+    </div>
   </div>
+
+<div class="columns medium-4" >
+  <div class="card">
+    <div class="card-section">
+      <p> Price </p>
+    </div>
+    <div class="card-divider">
+    {{cheapest.split(',')[1]}}
+    </div>
+  </div>
+</div>
+
+  <div class="columns medium-4" >
+    <div class="card">
+      <div class="card-section">
+        <p> Departure Station </p>
+      </div>
+      <div class="card-divider">
+        {{cheapestDeparture}}
+      </div>
+    </div>
+  </div>
+
+  <div class="columns medium-4" >
+    <div class="card">
+      <div class="card-section">
+        <p> Arrival Station </p>
+      </div>
+      <div class="card-divider">
+        {{cheapestArrival}}
+      </div>
+    </div>
+  </div>
+
+    <div class="columns medium-4" >
+  <div class="card">
+    <div class="card-section">
+      <p> Date & time of departure </p>
+    </div>
+    <div class="card-divider">
+      {{(this.methodPriceArray.filter(v=>v.split(',')[0]==cheapest.split(',')[0])[0]).split(',')[5]}}
+    </div>
+  </div>
+</div>
+
+<div class="columns medium-4" >
+  <div class="card">
+    <div class="card-section">
+      <p> Date & time of Arrival </p>
+    </div>
+    <div class="card-divider">
+      {{(this.methodPriceArray.filter(v=>v.split(',')[0]==cheapest.split(',')[0])[0]).split(',')[6]}}
+    </div>
+  </div>
+</div>
+
+<h3>Cheapest Options by Transport Type</h3>
+<ul>
+ <li v-for="(item,i) in methodPriceArray" :key="i">{{item}}</li>
+</ul>
+
+</div>
+
 </template>
 
 <script>
@@ -91,13 +168,13 @@ export default {
         //find duration, dep, arr in the result array
         for (let k=0; k< this.allData.result.length;k++){
           if (this.allData.result[k].transport===travelmethod&&this.allData.result[k].price===price) {
-            this.methodPriceArray[i] += `,${this.allData.result[k].segments[0].departure}, ${this.allData.result[k].segments[0].arrival}, ${this.allData.result[k].duration}`;
+            this.methodPriceArray[i] += `,${this.allData.result[k].segments[0].departure}, ${this.allData.result[k].segments[0].arrival}, ${this.allData.result[k].duration}, ${this.allData.result[k].segments[0].fromTimeISO8601},${this.allData.result[k].segments[0].toTimeISO8601}`;
             break;
           }
         }
       }
       console.log(this.methodPriceArray)
-      //bus,26.69 $,Sesto San Giovanni, Rome Tiburtina, 9h 45min
+      //car,31.71 $,Milan, Rome, 6h 30min, 2020-02-22T08:00:00+01:00,2020-02-22T14:30:00+01:00"
     },
   }
 }
